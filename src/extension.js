@@ -128,8 +128,11 @@ class Extension {
   }
 
   disable() {
+    this._clearIntervals();
     this.rebootToEntryItems.forEach((entry) => entry.destroy());
     this.rebootToEntryItems = null;
+    this.prettyNames = null;
+    this.selectedEntry = null;
     this.proxy = null;
   }
 
@@ -151,6 +154,7 @@ class Extension {
         label: _("Cancel"),
         action: () => {
           this._clearIntervals();
+          this.selectedEntry = null;
           dialog.close();
         },
         key: Clutter.KEY_Escape,
