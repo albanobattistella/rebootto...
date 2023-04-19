@@ -36,8 +36,9 @@ const _ = Domain.gettext;
 
 const ManagerInterface = `<node>
   <interface name="org.freedesktop.login1.Manager">
-    <method name="SetRebootToFirmwareSetup">
-      <arg type="b" direction="in"/>
+    <property name="BootLoaderEntries" type="as" access="read"/>
+    <method name="SetRebootToBootLoaderEntry">
+      <arg type="s" direction="in"/>
     </method>
     <method name="Reboot">
       <arg type="b" direction="in"/>
@@ -49,7 +50,9 @@ const Manager = Gio.DBusProxy.makeProxyWrapper(ManagerInterface);
 class Extension {
   menu
   proxy;
-  rebootToUefiItem;
+  rebootToEntryItems;
+  selectedEntry;
+  prettyNames;
   /** @type {number} */
   counter;
   /** @type {number} */
@@ -71,35 +74,62 @@ class Extension {
   enable() {
     this.proxy = new Manager(Gio.DBus.system, 'org.freedesktop.login1', '/org/freedesktop/login1');
 
-    this.rebootToUefiItem = new PopupMenu.PopupMenuItem(`${_('Restart to UEFI')}...`);
+    let entries = this.proxy.BootLoaderEntries;
 
-    this.rebootToUefiItem.connect('activate', () => {
-      this.counter = 60;
-      this.seconds = this.counter;
+    /*
+      prettyNames.set('Pop_OS-current.conf', 'Pop!_OS');
+      prettyNames.set('Pop_OS-recovery.conf', 'Pop!_OS Recovery');
+      prettyNames.set('Pop_OS-rescue.conf', 'Pop!_OS Rescue');
+      prettyNames.set('auto-windows', 'Windows');
+      prettyNames.set('auto-reboot-to-firmware-setup', 'Firmware Setup');
+        for Pop_OS-current.conf,Pop_OS-recovery.conf,Pop_OS-rescue.conf,auto-windows,auto-reboot-to-firmware-setup
+    */
+    
+    this.prettyNames = new Map();
 
-      const dialog = this._buildDialog();
-      dialog.open();
+    // log(`Found ${entries.length} entries for reboot: [${entries.join(', ')}]`);
+    this.rebootToEntryItems = new Array(entries.length);
 
-      this.counterIntervalId = setInterval(() => {
-        if (this.counter > 0) {
-          this.counter--;
-          if (this.counter % 10 === 0) {
-            this.seconds = this.counter;
+    entries.forEach((entry, index) => {
+      let prettyName = entry.replace(/\.conf$/, '').replace(/auto-reboot-to-firmware-setup/, 'UEFI').replace(/auto-/, '').replace(/-/, ' ');
+      prettyName = prettyName.charAt(0).toUpperCase() + prettyName.slice(1);
+      this.prettyNames.set(entry, prettyName);
+
+      const item = new PopupMenu.PopupMenuItem(`${_('Restart to %s').replace('%s', prettyName)}...`);
+      
+      item.connect('activate', () => {
+        this.counter = 60;
+        this.seconds = this.counter;
+        this.selectedEntry = entry;
+
+        log(`selected "${this.selectedEntry}" entry for reboot`);
+  
+        const dialog = this._buildDialog();
+        dialog.open();
+  
+        this.counterIntervalId = setInterval(() => {
+          if (this.counter > 0) {
+            this.counter--;
+            if (this.counter % 10 === 0) {
+              this.seconds = this.counter;
+            }
+          } else {
+            this._clearIntervals();
+            this._reboot();
           }
-        } else {
-          this._clearIntervals();
-          this._reboot();
-        }
-      }, 1000);
+        }, 1000);
+  
+      });
 
+      this.menu.addMenuItem(item, 2+index);
+      this.rebootToEntryItems[index] = item;
     });
-
-    this.menu.addMenuItem(this.rebootToUefiItem, 2);
+    
   }
 
   disable() {
-    this.rebootToUefiItem.destroy();
-    this.rebootToUefiItem = null;
+    this.rebootToEntryItems.forEach((entry) => entry.destroy());
+    this.rebootToEntryItems = null;
     this.proxy = null;
   }
 
@@ -109,7 +139,8 @@ class Extension {
   }
 
   _reboot() {
-    this.proxy.SetRebootToFirmwareSetupRemote(true);
+    log(`rebooting to ${this.selectedEntry}`)
+    this.proxy.SetRebootToBootLoaderEntryRemote(this.selectedEntry);
     this.proxy.RebootRemote(false);
   }
 
@@ -136,7 +167,7 @@ class Extension {
     ]);
 
     const dialogTitle = new St.Label({
-      text: _('Restart to UEFI'),
+      text: _('Restart to %s').replace('%s', this.prettyNames.get(this.selectedEntry)),
       // style_class: 'dialog-title' // TODO investigate why css classes are not working
       style: "font-weight: bold;font-size:18px"
     });

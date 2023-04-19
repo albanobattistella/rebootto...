@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 19:54+0100\n"
-"PO-Revision-Date: 2022-11-08 13:45+0100\n"
+"PO-Revision-Date: 2023-04-19 02:52+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch\n"
 "Language: nl\n"
@@ -18,8 +18,8 @@ msgstr ""
 "X-Generator: Lokalize 22.08.3\n"
 
 #: extension.js:63,122
-msgid "Restart to UEFI"
-msgstr "Herstarten naar UEFI"
+msgid "Restart to %s"
+msgstr "Herstarten naar %s"
 
 #: extension.js:103
 msgid "Cancel"

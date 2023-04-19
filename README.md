@@ -1,8 +1,10 @@
-# Reboot to UEFI
+# Reboot to ...
 
-This is a small Gnome extension that adds the ability to reboot directly to the UEFI.
+This is a small Gnome extension that adds the ability to reboot directly to an entity of the boot-loader. This is a fork of the way better extentions [Reboot to UEFI](https://github.com/UbayGD/reboottouefi) by [UbayGD](https://github.com/UbayGD/). This will also add the UEFI entry to the menu, so you don't need both extensions.
 
-![Screenshot of the extension option in the Gnome 43 menu](images/gnome_43.png)
+This extension rely on the DBus interface `org.freedesktop.login1` to both discover entries and request the reboot.
+
+![Screenshot of the extension options (Pop_OS, gnome 42.5)](images/Screenshot.png)
 
 <br>
 
@@ -23,6 +25,6 @@ To install the extension just run the **install.sh** script with the following c
 <hr>
 <br>
 
-# Notes
+<!-- # Notes
 
-- This extension is available in [GNOME Extensions](https://extensions.gnome.org/extension/5105/reboottouefi/).
+- This extension is available in [GNOME Extensions](https://extensions.gnome.org/extension/5105/reboottouefi/). -->

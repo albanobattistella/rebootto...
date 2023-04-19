@@ -1,10 +1,10 @@
 {
-  "name": "RebootToUEFI",
-  "description": "Reboot system into UEFI",
+  "name": "RebootTo...",
+  "description": "Reboot system into an entity from your bootloader",
   "license": "GPLv3",
-  "uuid": "reboottouefi@ubaygd.com",
-  "url": "https://github.com/UbayGD/reboottouefi",
-  "version": "13",
+  "uuid": "reboottosomething@jangberry.eu",
+  "url": "https://github.com/Jangberry/rebootto...",
+  "version": "1",
   "shell-version": [
     "42",
     "43",
