@@ -1,5 +1,5 @@
-NAME=reboottouefi
-DOMAIN=ubaygd.com
+NAME=rebootintoWindows
+DOMAIN=nimz.cool
 
 .PHONY: all pack install clean
 
@@ -26,9 +26,7 @@ pack: $(NAME)@$(DOMAIN).zip
 
 install: $(NAME)@$(DOMAIN).zip
 	@[ -d ~/.local/share/gnome-shell/extensions ] || mkdir -p ~/.local/share/gnome-shell/extensions
-	@touch ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
-	@rm -rf ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
-	@mv dist ~/.local/share/gnome-shell/extensions/$(NAME)@$(DOMAIN)
+	@gnome-extensions install $(NAME)@$(DOMAIN).zip --force
 
 clean:
 	@rm -rf dist node_modules $(NAME)@$(DOMAIN).zip
